@@ -1,16 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.MecanumDriveFieldRelative;
 
 
 @TeleOp
-public class FinalOpMode extends OpMode {
+public class OneDriverTeleOp extends OpMode {
 
     private enum RobotState{
 
@@ -20,8 +16,7 @@ public class FinalOpMode extends OpMode {
 
         EXPELIR,
 
-        DESLIGA,
-
+        DESLIGA,;
     }
 
     private enum Marchas {
@@ -36,10 +31,13 @@ public class FinalOpMode extends OpMode {
     RobotState previousRobotState = robotState;
 
     Marchas marchaAtual = Marchas.ALTA;
-    MecanumDriveFieldRelative driveFieldRelative = new MecanumDriveFieldRelative();
+    //MecanumDriveFieldRelative driveFieldRelative = new MecanumDriveFieldRelative();
 
-    private DcMotor Coletor;
+    private DcMotor Coletor,shooterMotorLeft,shooterMotorRight;
     double forward, strafe, rotate;
+
+
+
 
 
 
@@ -49,8 +47,12 @@ public class FinalOpMode extends OpMode {
     public void init () {
 
 
-        driveFieldRelative.init(hardwareMap);
-        Coletor = hardwareMap.get(DcMotor.class, "Coletor");
+        //driveFieldRelative.init(hardwareMap);
+        //Coletor = hardwareMap.get(DcMotor.class, "Coletor");
+        shooterMotorLeft = hardwareMap.get(DcMotor.class, "shooterMotorLeft");
+        shooterMotorRight = hardwareMap.get(DcMotor.class, "shooterMotorRight");
+        //shooterMotorLeft.setDirection(DcMotor.Direction.REVERSE);
+
         // intake = new Intake(hardwareMap);
         // shooter = new Shooter(hardwareMap);
 
@@ -80,7 +82,7 @@ public class FinalOpMode extends OpMode {
     public void loop() {
 
 
-        boolean rightStick = gamepad1.right_stick_button;
+        /*boolean rightStick = gamepad1.right_stick_button;
         boolean leftStick = gamepad1.left_stick_button;
 
         switch (marchaAtual){
@@ -97,18 +99,22 @@ public class FinalOpMode extends OpMode {
                 driveFieldRelative.setMaxSpeed(0.3);
                 if (rightStick && !isPreviousRightStick) {marchaAtual = Marchas.MEDIA;}
                 break;
-        }
+        }*/
+
         if (gamepad1.x) {
-            Coletor.setPower(0.8);
+            shooterMotorLeft.setPower(0.9);
+            shooterMotorRight.setPower(-0.9);
         }
         else if (gamepad1.b){
-            Coletor.setPower(-0.8);
+            shooterMotorLeft.setPower(-0.9);
+            shooterMotorRight.setPower(0.9);
         }
         else {
-            Coletor.setPower(0);
+            shooterMotorLeft.setPower(0);
+            shooterMotorRight.setPower(0);
         }
-
         /*
+
 
         boolean buttonX = gamepad1.x;
         boolean buttonY = gamepad1.y;
@@ -166,18 +172,18 @@ public class FinalOpMode extends OpMode {
 
 
 
-        forward = gamepad1.left_stick_y;
+        /*forward = gamepad1.left_stick_y;
         strafe = -gamepad1.left_stick_x*1.1;
         rotate = -gamepad1.right_stick_x;
 
-        driveFieldRelative.drive(forward,strafe,rotate);
+        driveFieldRelative.drive(forward,strafe,rotate);*/
 
         telemetry.addData("Marcha atual", marchaAtual);
         telemetry.addData("Estado atual do robo", robotState);
         telemetry.addData("Estado anterior do robo", previousRobotState);
-        telemetry.addData("Yaw (Z)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.addData("Pitch (X)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES));
-        telemetry.addData("Roll (Y)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES));
+        //telemetry.addData("Yaw (Z)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        //telemetry.addData("Pitch (X)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES));
+        //telemetry.addData("Roll (Y)", driveFieldRelative.imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES));
         telemetry.update();
 
         /*isPreviousRightStick = rightStick;
