@@ -35,6 +35,13 @@ public class MainTeleop extends NextOpMode {
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
+
+        // 4. SHOOTER: Segura o Right Bumper para ligar (ex: 80% de potência), solta para desligar
+        driver.rightBumper().whileTrue(robot.shooter.shoot(0.8));
+        // 5. COLETOR: Segura o botão 'A' para puxar (100% de potência), solta para desligar
+        driver.a().whileTrue(robot.collector.collect(1.0));
+        // (Opcional) BÔNUS: Segura o botão 'B' para reverter o coletor e cuspir a peça
+        driver.b().whileTrue(robot.collector.reverse(1.0));
     }
 
     @Override
