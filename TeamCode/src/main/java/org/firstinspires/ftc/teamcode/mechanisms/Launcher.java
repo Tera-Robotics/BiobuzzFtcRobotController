@@ -84,14 +84,14 @@ public class Launcher implements Mechanism {
         // kS: Força mínima inicial para vencer o atrito da caixa de 90° e começar a girar
         // kV: Tensão proporcional necessária para manter a alta rotação estável
         // kP: Correção ativa rápida se a roda perder velocidade ao tocar a peça
-        rightLauncher.getVelocityConstants().setKS(0.0046);
-        rightLauncher.getVelocityConstants().setKV(0.00034 / TICKS_TO_DEGREES);
+        rightLauncher.getVelocityConstants().setKS(0.0057);
+        rightLauncher.getVelocityConstants().setKV(0.00045 / TICKS_TO_DEGREES);
         rightLauncher.getVelocityConstants().setKP(0.00036 / TICKS_TO_DEGREES);
 
         // Faz o motor esquerdo seguir o direito no sentido INVERSO para prensar e cuspir a peça
         // (Se as rodas girarem para fora em vez de para dentro, mude REVERSE para FORWARD)
         rightLauncher.setDirection(NextMotor.Direction.REVERSE);
-        //leftLauncher.follow(rightLauncher, NextMotor.Direction.FORWARD);
+        leftLauncher.follow(rightLauncher, NextMotor.Direction.FORWARD);
 
         // Inicia com os motores desligados
         stop();

@@ -38,7 +38,7 @@ public class MainTeleop extends NextOpMode {
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
 
-        driver.y().onTrue(robot.launcher.setRpmCommand(4500));
+        driver.y().onTrue(robot.launcher.setRpmCommand(2200));
         // Aperta X -> Desliga o lançador
         driver.x().onTrue(robot.launcher.stopCommand());
         // (Opcional) D-pad UP -> Coloca em modo de espera (IDLE ~2000 RPM)
