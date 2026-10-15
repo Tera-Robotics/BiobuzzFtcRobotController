@@ -485,7 +485,7 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
      * Often these external sensors are absolute (meaning they measure something about the field)
      * so their data is very accurate. But they can be slower to read, or you may need to be in a very specific
      * position on the field to use them. In that case, spend most of your time relying on the Pinpoint
-     * to determine your location. Then when you pull a new position from your secondary sensor,
+     * to determine your location. Then, when you pull a new position from your secondary sensor,
      * send a setPosition command with the new position. The Pinpoint will then track your movement
      * relative to that new, more accurate position.
      * @param pos a Pose2D describing the robot's new position.

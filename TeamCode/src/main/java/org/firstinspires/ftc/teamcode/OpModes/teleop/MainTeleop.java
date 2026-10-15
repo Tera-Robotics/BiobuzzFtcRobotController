@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.OpModes.teleop;
 import com.pedropathing.ivy.commands.Commands;
 
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
 
+import dev.nextftc.hardware.actuators.NextMotor;
 import dev.nextftc.robot.drive.DriveCommands;
 import dev.nextftc.robot.opmode.BulkReadHook;
 import dev.nextftc.robot.opmode.NextOpMode;
@@ -16,9 +18,11 @@ public class MainTeleop extends NextOpMode {
     private final Robot robot;
     private final CommandGamepad driver;
 
-    // O NextFTC injeta a instância do Robot criada no passo 2 aqui automaticamente
-    public MainTeleop(Robot robot) {
-        // Passamos BulkReadHook.INSTANCE para otimizar as leituras do Hub via barramento
+    public MainTeleop() {
+        this(new Robot());
+    }
+    private MainTeleop(Robot robot) {
+
         super(robot, BulkReadHook.INSTANCE);
         this.robot = robot;
         this.driver = new CommandGamepad(gamepad1);
@@ -26,29 +30,40 @@ public class MainTeleop extends NextOpMode {
 
     @Override
     public void start() {
-        // 1. Inicia o comando de pilotagem do Drivetrain
+
         robot.drivetrain.drive(gamepad1).schedule();
 
-        // 2. BÔNUS: Modo Lento (Slow Mode) ao segurar o Left Bumper
-        // Quando aperta o Bumper, reduz a velocidade para 40%; ao soltar, volta para 100%
         driver.leftBumper().whileTrue(
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
 
-        // 4. SHOOTER: Segura o Right Bumper para ligar (ex: 80% de potência), solta para desligar
-        driver.rightBumper().whileTrue(robot.shooter.shoot(0.8));
-        // 5. COLETOR: Segura o botão 'A' para puxar (100% de potência), solta para desligar
-        driver.a().whileTrue(robot.collector.collect(1.0));
-        // (Opcional) BÔNUS: Segura o botão 'B' para reverter o coletor e cuspir a peça
-        driver.b().whileTrue(robot.collector.reverse(1.0));
+        driver.y().onTrue(robot.launcher.setRpmCommand(4500));
+        // Aperta X -> Desliga o lançador
+        driver.x().onTrue(robot.launcher.stopCommand());
+        // (Opcional) D-pad UP -> Coloca em modo de espera (IDLE ~2000 RPM)
+        driver.a().onTrue(robot.launcher.idleCommand());
     }
+
 
     @Override
     public void periodic() {
-        // Roda a cada ciclo enquanto estiver em PLAY.
-        // O NextFTC já dá flush automático na telemetria, não precisa chamar telemetry.update()!
+
+        telemetry.addData("Status", "NextFTC Ativo!");
+        telemetry.addData("Velocidade Drivetrain", DriveCommands.getScalar());
+        // Informações em tempo real do Lançador
+        telemetry.addData("Lançador Estado", robot.launcher.getState());
+        telemetry.addData("Lançador RPM Alvo", "%.0f RPM", robot.launcher.getTargetRPM());
+        telemetry.addData("Lançador RPM Real", "%.0f RPM", robot.launcher.getCurrentRPM());
+        telemetry.addData("Lançador Pronto?", robot.launcher.isReady() ? "SIM (LIVRE)" : "AGUARDE");
+
+
         telemetry.addData("Status", "NextFTC Ativo!");
         telemetry.addData("Velocidade Atual", DriveCommands.getScalar());
+    }
+
+    @Override
+    public void end() {
+        NextMotor.Companion.getMotorEventLoop().clear();
     }
 }
