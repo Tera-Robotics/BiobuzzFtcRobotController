@@ -1,83 +1,58 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.List;
 
-@TeleOp(name = "Detectar e Contar Pollen", group = "Visao")
+@TeleOp(name = "Detectar Pollen Limelight", group = "Visao")
 public class LimeLightDetectorDePollen extends LinearOpMode {
-
     private Limelight3A limelight;
-    private static final int PIPELINE_POLLEN = 1;
-
+    // Configuração do Pipeline (coloque o número do pipeline que você calibrou para o pollen)
+    private static final int PIPELINE_POLLEN = 0;
     @Override
     public void runOpMode() {
+        // Busca a Limelight pelo tipo, sem depender de nome específico no Control Hub
         List<Limelight3A> lista = hardwareMap.getAll(Limelight3A.class);
-
         if (lista.isEmpty()) {
-            telemetry.addLine("ERRO: Nenhuma Limelight encontrada!");
+            telemetry.addLine("ERRO: Nenhuma Limelight encontrada conectada!");
             telemetry.update();
             waitForStart();
             return;
         }
-
+        // Pega a primeira Limelight disponível
         limelight = lista.get(0);
-
-        // muda para o pipeline do Pollen e inicia
+        // Troca para o pipeline de detecção do Pollen
         limelight.pipelineSwitch(PIPELINE_POLLEN);
         limelight.start();
-
         telemetry.addLine("Limelight conectada com sucesso!");
-        telemetry.addLine("Aguardando START no Driver Hub...");
+        telemetry.addLine("Aguardando START...");
         telemetry.update();
-
         waitForStart();
-
         while (opModeIsActive()) {
             LLResult result = limelight.getLatestResult();
-
+            // result.isValid() é o equivalente ao tv == 1 (está vendo o pollen)
             if (result != null && result.isValid()) {
-                // Pega alvos por detecção de cor
-                List<LLResultTypes.ColorResult> pollensCores = result.getColorResults();
-
-                // Define a quantidade total de pollens encontrados
-                int qtdPollens = 0;
-                if (!pollensCores.isEmpty()) {
-                    qtdPollens = pollensCores.size();
-                } else {
-                    // Fallback: se isValid() é true mas a lista veio vazia, há pelo menos 1 alvo principal
-                    qtdPollens = 1;
-                }
-
+                double tx = result.getTx(); // Ângulo horizontal para o pollen
+                double ty = result.getTy(); // Ângulo vertical
+                double ta = result.getTa(); // Área (% da tela)
+                int quantidade = result.getColorResults().size();
                 telemetry.addLine("=== POLLEN DETECTADO ===");
-                telemetry.addData("Quantidade de Pollens", qtdPollens);
-
-                // Dados do alvo mais central/principal
-                telemetry.addData("TX (Horizontal)", "%.2f°", result.getTx());
-                telemetry.addData("TY (Vertical)", "%.2f°", result.getTy());
-                telemetry.addData("TA (Área)", "%.2f%%", result.getTa());
-
-                // Detalhes de cada pollen individual encontrado (por cor)
-                if (!pollensCores.isEmpty()) {
-                    for (int i = 0; i < pollensCores.size(); i++) {
-                        LLResultTypes.ColorResult p = pollensCores.get(i);
-                        telemetry.addData("Pollen #" + (i + 1), "X: %.1f°, Y: %.1f°",
-                                p.getTargetXDegrees(), p.getTargetYDegrees());
-                    }
-                }
+                telemetry.addData("Vê Pollen?", "SIM");
+                telemetry.addData("TX (Girar)", "%.2f graus", tx);
+                telemetry.addData("TY", "%.2f graus", ty);
+                telemetry.addData("TA (Área)", "%.2f %%", ta);
+                telemetry.addData("Quantidade de pollen:", "%d", quantidade);
+                // Dica: se tx < 0 o pollen está à esquerda; se tx > 0 está à direita
 
             } else {
                 telemetry.addLine("=== PROCURANDO POLLEN ===");
-                telemetry.addData("Quantidade de Pollens", 0);
+                telemetry.addData("Vê Pollen?", "NÃO");
             }
-
             telemetry.update();
         }
-
         limelight.stop();
     }
 }

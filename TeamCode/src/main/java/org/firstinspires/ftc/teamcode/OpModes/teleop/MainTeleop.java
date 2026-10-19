@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.OpModes.teleop;
 
+import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.commands.Commands;
 
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import dev.nextftc.hardware.actuators.NextMotor;
 import dev.nextftc.robot.drive.DriveCommands;
@@ -18,10 +20,9 @@ public class MainTeleop extends NextOpMode {
     private final Robot robot;
     private final CommandGamepad driver;
 
-    public MainTeleop() {
-        this(new Robot());
-    }
-    private MainTeleop(Robot robot) {
+    private Follower follower;
+
+    public MainTeleop(Robot robot) {
 
         super(robot, BulkReadHook.INSTANCE);
         this.robot = robot;
@@ -31,23 +32,32 @@ public class MainTeleop extends NextOpMode {
     @Override
     public void start() {
 
-        robot.drivetrain.drive(gamepad1).schedule();
+        follower = Constants.create(hardwareMap);
+
+        DriveCommands.mecanumDriveFieldCentric(
+                robot.drivetrain.leftFront,
+                robot.drivetrain.rightFront,
+                robot.drivetrain.leftBack,
+                robot.drivetrain.rightBack,
+                gamepad1,
+                () -> follower.pose().heading()
+        ).schedule();
 
         driver.leftBumper().whileTrue(
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
 
-        driver.y().onTrue(robot.launcher.setRpmCommand(2200));
-        // Aperta X -> Desliga o lançador
+        driver.y().onTrue(robot.launcher.setRpmCommand(2220));
         driver.x().onTrue(robot.launcher.stopCommand());
-        // (Opcional) D-pad UP -> Coloca em modo de espera (IDLE ~2000 RPM)
         driver.a().onTrue(robot.launcher.idleCommand());
     }
 
 
     @Override
     public void periodic() {
+
+        follower.update();
 
         telemetry.addData("Status", "NextFTC Ativo!");
         telemetry.addData("Velocidade Drivetrain", DriveCommands.getScalar());
@@ -64,6 +74,5 @@ public class MainTeleop extends NextOpMode {
 
     @Override
     public void end() {
-        NextMotor.Companion.getMotorEventLoop().clear();
     }
 }
