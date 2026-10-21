@@ -40,7 +40,7 @@ public class Launcher implements Mechanism {
     public static final double IDLE_RPM = 2000.0;
 
     // Preset de lançamento longo/alto (velocidade alta)
-    public static final double HIGH_GOAL_RPM = 5200.0;
+    public static final double HIGH_GOAL_RPM = 2350;
 
     // Preset de lançamento curto/baixo (velocidade média)
     public static final double LOW_GOAL_RPM = 4000.0;
@@ -85,14 +85,13 @@ public class Launcher implements Mechanism {
         // kV: Tensão proporcional necessária para manter a alta rotação estável
         // kP: Correção ativa rápida se a roda perder velocidade ao tocar a peça
         rightLauncher.getVelocityConstants().setKS(0.0057);
-        rightLauncher.getVelocityConstants().setKV(0.00045 / TICKS_TO_DEGREES);
-        rightLauncher.getVelocityConstants().setKP(0.00036 / TICKS_TO_DEGREES);
+        rightLauncher.getVelocityConstants().setKV(0.00055 / TICKS_TO_DEGREES);
+        rightLauncher.getVelocityConstants().setKP(0.00035 / TICKS_TO_DEGREES);
 
         // Faz o motor esquerdo seguir o direito no sentido INVERSO para prensar e cuspir a peça
         // (Se as rodas girarem para fora em vez de para dentro, mude REVERSE para FORWARD)
-        rightLauncher.setDirection(NextMotor.Direction.REVERSE);
-        leftLauncher.follow(rightLauncher, NextMotor.Direction.FORWARD);
-
+        rightLauncher.setDirection(NextMotor.Direction.FORWARD);
+        leftLauncher.follow(rightLauncher, NextMotor.Direction.REVERSE);
         // Inicia com os motores desligados
         stop();
 

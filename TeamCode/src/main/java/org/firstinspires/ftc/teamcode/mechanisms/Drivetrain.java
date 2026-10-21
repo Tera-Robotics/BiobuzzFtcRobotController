@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.pedropathing.ivy.Command;
@@ -11,6 +12,7 @@ import dev.nextftc.robot.drive.DriveCommands;
 
 
 public class Drivetrain implements Mechanism {
+
     public final NextMotor rightFront = new NextMotor("rightFront");
     public final NextMotor rightBack = new NextMotor("rightBack");
     public final NextMotor leftFront = new NextMotor("leftFront");
@@ -25,7 +27,6 @@ public class Drivetrain implements Mechanism {
         leftBack.setDirection(NextMotor.Direction.FORWARD);
         rightBack.setDirection(NextMotor.Direction.REVERSE);
     }
-
 
     public Command driveFieldCentric(Gamepad gamepad, Supplier<Double> headingSupplier) {
         return DriveCommands.mecanumDriveFieldCentric(

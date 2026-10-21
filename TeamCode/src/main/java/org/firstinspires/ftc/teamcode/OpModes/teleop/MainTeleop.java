@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes.teleop;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.commands.Commands;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
@@ -13,6 +14,7 @@ import dev.nextftc.robot.opmode.BulkReadHook;
 import dev.nextftc.robot.opmode.NextOpMode;
 import dev.nextftc.robot.opmode.NextTeleop;
 import dev.nextftc.robot.triggers.CommandGamepad;
+
 
 @NextTeleop(name = "TeleOp Principal", group = "TeleOp")
 public class MainTeleop extends NextOpMode {
@@ -42,6 +44,7 @@ public class MainTeleop extends NextOpMode {
                 gamepad1,
                 () -> follower.pose().heading()
         ).schedule();
+
 
         driver.leftBumper().whileTrue(
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))

@@ -1,58 +1,75 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import java.util.List;
 
-@TeleOp(name = "Detectar Pollen Limelight", group = "Visao")
+@TeleOp(name = "Exemplo Limelight 3A")
 public class LimeLightDetectorDePollen extends LinearOpMode {
+
     private Limelight3A limelight;
-    // Configuração do Pipeline (coloque o número do pipeline que você calibrou para o pollen)
-    private static final int PIPELINE_POLLEN = 0;
+
     @Override
     public void runOpMode() {
-        // Busca a Limelight pelo tipo, sem depender de nome específico no Control Hub
+        // 1. Inicializa a Limelight configurada no Robot Controller
         List<Limelight3A> lista = hardwareMap.getAll(Limelight3A.class);
-        if (lista.isEmpty()) {
-            telemetry.addLine("ERRO: Nenhuma Limelight encontrada conectada!");
-            telemetry.update();
-            waitForStart();
-            return;
-        }
-        // Pega a primeira Limelight disponível
-        limelight = lista.get(0);
-        // Troca para o pipeline de detecção do Pollen
-        limelight.pipelineSwitch(PIPELINE_POLLEN);
-        limelight.start();
-        telemetry.addLine("Limelight conectada com sucesso!");
-        telemetry.addLine("Aguardando START...");
-        telemetry.update();
-        waitForStart();
-        while (opModeIsActive()) {
-            LLResult result = limelight.getLatestResult();
-            // result.isValid() é o equivalente ao tv == 1 (está vendo o pollen)
-            if (result != null && result.isValid()) {
-                double tx = result.getTx(); // Ângulo horizontal para o pollen
-                double ty = result.getTy(); // Ângulo vertical
-                double ta = result.getTa(); // Área (% da tela)
-                int quantidade = result.getColorResults().size();
-                telemetry.addLine("=== POLLEN DETECTADO ===");
-                telemetry.addData("Vê Pollen?", "SIM");
-                telemetry.addData("TX (Girar)", "%.2f graus", tx);
-                telemetry.addData("TY", "%.2f graus", ty);
-                telemetry.addData("TA (Área)", "%.2f %%", ta);
-                telemetry.addData("Quantidade de pollen:", "%d", quantidade);
-                // Dica: se tx < 0 o pollen está à esquerda; se tx > 0 está à direita
 
+        // 2. Seleciona o pipeline da rede neural (número do pipeline que você criou)
+        limelight.pipelineSwitch(2);
+
+        // 3. Liga o processamento de visão da Limelight
+        limelight.start();
+
+        telemetry.addData("Status", "Limelight pronta!");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            // 4. Pega o resultado mais recente da câmera
+            LLResult result = limelight.getLatestResult();
+
+            if (result != null && result.isValid()) {
+                // Pega a lista de todas as bolinhas que ela detectou
+                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+
+                for (LLResultTypes.DetectorResult dr : detectorResults) {
+                    String nome = dr.getClassName();        // Nome da classe
+                    double tx = dr.getTargetXDegrees();     // Ângulo horizontal
+                    double ty = dr.getTargetYDegrees();     // Ângulo vertical
+                    double confianca = dr.getConfidence();  // Certeza da IA (0 a 1)
+
+                    telemetry.addData("Objeto", nome);
+                    telemetry.addData("TX (Horizontal)", tx);
+                    telemetry.addData("TY (Vertical)", ty);
+                    telemetry.addData("Confiança", confianca * 100 + "%");
+
+                    // 5. Calcula a distância aproximada até a bolinha (em cm)
+                    double distancia = calcularDistancia(ty);
+                    telemetry.addData("Distância (cm)", distancia);
+                }
             } else {
-                telemetry.addLine("=== PROCURANDO POLLEN ===");
-                telemetry.addData("Vê Pollen?", "NÃO");
+                telemetry.addData("Status", "Procurando bolinha...");
             }
+
             telemetry.update();
         }
+
+        // Desliga a câmera ao encerrar
         limelight.stop();
+    }
+
+    // Método simples para calcular distância por trigonometria
+    public double calcularDistancia(double ty) {
+        double alturaCamera = 25.0; // Altura da lente em cm do chão (meça com fita métrica)
+        double alturaAlvo = 3.5;    // Altura do centro da bolinha no chão (cm)
+        double anguloCamera = 15.0; // Ângulo de inclinação da câmera para baixo/cima (graus)
+
+        // Fórmula trigonométrica oficial da Limelight
+        double anguloTotalRad = Math.toRadians(anguloCamera + ty);
+        return (alturaAlvo - alturaCamera) / Math.tan(anguloTotalRad);
     }
 }

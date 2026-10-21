@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
 import java.util.Set;
 
 public class Robot implements NextRobot {
+    // Drivetrain desativado para testes isolados do shooter:
     public final Drivetrain drivetrain = new Drivetrain();
 
     //public final Collector collector = new Collector();
@@ -18,7 +19,7 @@ public class Robot implements NextRobot {
 
     @Override
     public Set<Mechanism> getMechanisms() {
-        return Set.of(drivetrain,launcher);
+        return Set.of(launcher);
     }
 
     @Override
