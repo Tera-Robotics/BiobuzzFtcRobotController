@@ -37,13 +37,13 @@ public class Launcher implements Mechanism {
     // =========================================================================
 
     // Rotação de espera (mantém o motor girando para acelerar mais rápido na hora do tiro)
-    public static final double IDLE_RPM = 2000.0;
+    public static final double IDLE_RPM = 1000.0;
 
     // Preset de lançamento longo/alto (velocidade alta)
-    public static final double HIGH_GOAL_RPM = 2350;
+    public static final double HIGH_GOAL_RPM = 2650;
 
     // Preset de lançamento curto/baixo (velocidade média)
-    public static final double LOW_GOAL_RPM = 4000.0;
+    public static final double LOW_GOAL_RPM = 500.0;
 
     // Tolerância aceitável de erro para considerar o lançador "pronto" (ex: ±100 RPM)
     public static final double RPM_TOLERANCE = 100.0;

@@ -2,19 +2,15 @@ package org.firstinspires.ftc.teamcode.OpModes.teleop;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.commands.Commands;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-import dev.nextftc.hardware.actuators.NextMotor;
 import dev.nextftc.robot.drive.DriveCommands;
 import dev.nextftc.robot.opmode.BulkReadHook;
 import dev.nextftc.robot.opmode.NextOpMode;
 import dev.nextftc.robot.opmode.NextTeleop;
 import dev.nextftc.robot.triggers.CommandGamepad;
-
 
 @NextTeleop(name = "TeleOp Principal", group = "TeleOp")
 public class MainTeleop extends NextOpMode {
@@ -22,7 +18,7 @@ public class MainTeleop extends NextOpMode {
     private final Robot robot;
     private final CommandGamepad driver;
 
-    private Follower follower;
+   private Follower follower;
 
     public MainTeleop(Robot robot) {
 
@@ -50,29 +46,28 @@ public class MainTeleop extends NextOpMode {
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
-
         driver.y().onTrue(robot.launcher.setRpmCommand(2220));
         driver.x().onTrue(robot.launcher.stopCommand());
         driver.a().onTrue(robot.launcher.idleCommand());
+
+        
     }
 
 
     @Override
     public void periodic() {
 
-        follower.update();
+        //follower.update();
 
         telemetry.addData("Status", "NextFTC Ativo!");
-        telemetry.addData("Velocidade Drivetrain", DriveCommands.getScalar());
+        //telemetry.addData("Velocidade Drivetrain", DriveCommands.getScalar());
         // Informações em tempo real do Lançador
         telemetry.addData("Lançador Estado", robot.launcher.getState());
         telemetry.addData("Lançador RPM Alvo", "%.0f RPM", robot.launcher.getTargetRPM());
         telemetry.addData("Lançador RPM Real", "%.0f RPM", robot.launcher.getCurrentRPM());
         telemetry.addData("Lançador Pronto?", robot.launcher.isReady() ? "SIM (LIVRE)" : "AGUARDE");
-
-
         telemetry.addData("Status", "NextFTC Ativo!");
-        telemetry.addData("Velocidade Atual", DriveCommands.getScalar());
+        //telemetry.addData("Velocidade Atual", DriveCommands.getScalar());
     }
 
     @Override

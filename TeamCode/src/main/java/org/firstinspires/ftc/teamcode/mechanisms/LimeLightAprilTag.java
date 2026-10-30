@@ -1,28 +1,25 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 import java.util.List;
 
-@TeleOp(name = "Teste Limelight Sem Nome", group = "Teste")
-public class TesteLimeLightAprilTag extends LinearOpMode {
+@TeleOp(name = "AprilTagDetector", group = "Teste")
+public class LimeLightAprilTag extends LinearOpMode {
 
     private Limelight3A limelight;
 
-    // h1: Altura da lente da câmera até o chão (em metros)
-    private static final double CAMERA_HEIGHT_METERS = 7.8;
-    // h2: Altura do centro da AprilTag até o chão (em metros)
-    private static final double TARGET_HEIGHT_METERS = 18.5;
+    // h1: Altura da lente da câmera até o chão (em cm)
+    private static final double CAMERA_HEIGHT_METERS = 0.322;
+    // h2: Altura do centro da AprilTag até o chão (em cm)
+    private static final double TARGET_HEIGHT_METERS = 1.268;
 
     // a1: Ângulo de inclinação da câmera para cima (em graus).
     // Se estiver 100% reta na horizontal, coloque 0.0.
-    private static final double CAMERA_ANGLE_DEGREES = 0;
+    private static final double CAMERA_ANGLE_DEGREES = 35.22;
 
     @Override
     public void runOpMode() {
@@ -75,9 +72,6 @@ public class TesteLimeLightAprilTag extends LinearOpMode {
         double heightDifference = TARGET_HEIGHT_METERS - CAMERA_HEIGHT_METERS;
         // Evita divisão por zero ou tangentes inválidas
         double tangent = Math.tan(totalAngleRadians);
-        if (Math.abs(tangent) < 1e-4) {
-            return 0.0;
-        }
         return heightDifference / tangent;
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,6 +16,7 @@ public class LimeLightDetectorDePollen extends LinearOpMode {
     public void runOpMode() {
         // 1. Inicializa a Limelight configurada no Robot Controller
         List<Limelight3A> lista = hardwareMap.getAll(Limelight3A.class);
+        limelight = lista.get(0);
 
         // 2. Seleciona o pipeline da rede neural (número do pipeline que você criou)
         limelight.pipelineSwitch(2);
@@ -64,12 +65,12 @@ public class LimeLightDetectorDePollen extends LinearOpMode {
 
     // Método simples para calcular distância por trigonometria
     public double calcularDistancia(double ty) {
-        double alturaCamera = 25.0; // Altura da lente em cm do chão (meça com fita métrica)
-        double alturaAlvo = 3.5;    // Altura do centro da bolinha no chão (cm)
-        double anguloCamera = 15.0; // Ângulo de inclinação da câmera para baixo/cima (graus)
+        double alturaCamera = 29; // Altura da lente em cm do chão (meça com fita métrica)
+        double alturaAlvo = 3.665;    // Altura do centro da bolinha no chão (cm)
+        double anguloCamera = 19.1; // Ângulo de inclinação da câmera para baixo/cima (graus)
 
         // Fórmula trigonométrica oficial da Limelight
-        double anguloTotalRad = Math.toRadians(anguloCamera + ty);
+        double anguloTotalRad = Math.toRadians(anguloCamera - ty);
         return (alturaAlvo - alturaCamera) / Math.tan(anguloTotalRad);
     }
 }
