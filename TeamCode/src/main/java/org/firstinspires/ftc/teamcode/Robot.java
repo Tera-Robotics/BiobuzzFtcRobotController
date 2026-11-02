@@ -52,7 +52,7 @@ public class Robot implements NextRobot {
 
     @Override
     public Set<Mechanism> getMechanisms() {
-        return Set.of(launcher, continuousServo);
+        return Set.of(launcher, collector);
     }
 
     @Override

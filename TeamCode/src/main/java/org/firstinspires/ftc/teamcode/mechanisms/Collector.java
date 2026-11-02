@@ -7,17 +7,17 @@ import dev.nextftc.hardware.actuators.NextMotor;
 import dev.nextftc.robot.Mechanism;
 
 public class Collector implements Mechanism {
-    public final NextMotor rightMotor = new NextMotor("rightIntakeMotor");
-    public final NextMotor leftMotor = new NextMotor("leftIntakeMotor");
+    public final NextMotor collectMotor1 = new NextMotor("collectMotor1");
+    public final NextMotor collectMotor2 = new NextMotor("collectMotor2");
 
 public Collector() {
-    leftMotor.follow(rightMotor, NextMotor.Direction.REVERSE);
+    collectMotor1.follow(collectMotor2, NextMotor.Direction.FORWARD);
 }
 public Command collect(double Throttle){
-    return instant(() -> rightMotor.setThrottle(Throttle));
+    return instant(() -> collectMotor2.setThrottle(Throttle));
 }
 
     public Command stopCollector() {
-        return instant(() -> rightMotor.setThrottle(0.0));
+        return instant(() -> collectMotor2.setThrottle(0.0));
     }
 }

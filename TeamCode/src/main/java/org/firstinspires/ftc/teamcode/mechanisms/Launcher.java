@@ -90,8 +90,8 @@ public class Launcher implements Mechanism {
 
         // Faz o motor esquerdo seguir o direito no sentido INVERSO para prensar e cuspir a peça
         // (Se as rodas girarem para fora em vez de para dentro, mude REVERSE para FORWARD)
-        rightLauncher.setDirection(NextMotor.Direction.FORWARD);
-        leftLauncher.follow(rightLauncher, NextMotor.Direction.REVERSE);
+        rightLauncher.setDirection(NextMotor.Direction.REVERSE);
+        leftLauncher.follow(rightLauncher, NextMotor.Direction.FORWARD);
         // Inicia com os motores desligados
         stop();
 

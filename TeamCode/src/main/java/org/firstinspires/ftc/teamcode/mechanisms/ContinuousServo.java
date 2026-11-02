@@ -15,7 +15,7 @@ import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.commands.Commands.branch;
 
 public class ContinuousServo implements Mechanism {
-    public final NextCRServo limelightServo = new NextCRServo(RobotController.controlHub(), 0);
+    /*public final NextCRServo limelightServo = new NextCRServo(RobotController.controlHub(), 0);
     protected boolean lIsRaised = false;
 
     public boolean isLimelightRaised(){
@@ -44,6 +44,6 @@ public class ContinuousServo implements Mechanism {
         lPosition.put(() -> true, lowerArm());
 
         return branch(lPosition);
-    }
+    }*/
     }
 

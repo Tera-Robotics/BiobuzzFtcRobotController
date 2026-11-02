@@ -46,11 +46,16 @@ public class MainTeleop extends NextOpMode {
                 Commands.infinite(() -> DriveCommands.setScalar(0.4))
                         .setEnd(interrupted -> DriveCommands.setScalar(1.0))
         );
-        driver.y().onTrue(robot.launcher.setRpmCommand(2220));
+
+
+
+
+        driver.y().onTrue(robot.launcher.setRpmCommand(2300));
         driver.x().onTrue(robot.launcher.stopCommand());
         driver.a().onTrue(robot.launcher.idleCommand());
+        driver.b().onTrue(robot.collector.collect(-0.6));
 
-        
+
     }
 
 
