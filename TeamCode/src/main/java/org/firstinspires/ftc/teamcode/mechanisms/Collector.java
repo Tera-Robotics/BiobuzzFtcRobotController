@@ -14,10 +14,10 @@ public Collector() {
     collectMotor1.follow(collectMotor2, NextMotor.Direction.FORWARD);
 }
 public Command collect(double Throttle){
-    return instant(() -> collectMotor2.setThrottle(Throttle));
+    return infinite(() -> collectMotor2.setThrottle(Throttle));
 }
 
     public Command stopCollector() {
-        return instant(() -> collectMotor2.setThrottle(0.0));
+        return infinite(() -> collectMotor2.setThrottle(0.0));
     }
 }
