@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.teleop;
 
-import static org.firstinspires.ftc.teamcode.OpModes.teleop.RobotState.COLLECT;
-
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.ivy.commands.Commands;
 
 import org.firstinspires.ftc.teamcode.Robot;
@@ -51,21 +50,23 @@ public class MainTeleop extends NextOpMode {
 
 
 
-        driver.y().onTrue(robot.launcher.setRpmCommand(2300));
+        driver.y().onTrue(robot.launcher.setRpmCommand(2200));
         driver.x().onTrue(robot.launcher.stopCommand());
         driver.a().onTrue(robot.launcher.idleCommand());
         driver.b().onTrue(robot.collector.collect(-0.6));
+        robot.handleState(() -> gamepad1.dpad_down).schedule();
 
 
     }
     private boolean oldR2 = false;
     private RobotState lastState = null;
 
+
     @Override
     public void periodic() {
         boolean r2 = gamepad1.right_trigger > 0.3;
         if (r2 && !oldR2 &&
-                robot.currentState == RobotState.COLLECT) {
+                (robot.currentState == RobotState.COLLECT)) {
             robot.currentState = RobotState.PREPARE;
             robot.handleState(() -> gamepad1.dpad_down).schedule();
         }
