@@ -28,6 +28,17 @@ public class Drivetrain implements Mechanism {
         rightBack.setDirection(NextMotor.Direction.REVERSE);
     }
 
+    // 1. Modo SEM orientação à arena (Robot-Centric)
+    public Command driveRobotCentric(Gamepad gamepad) {
+        return DriveCommands.mecanumDrive(
+                leftFront,
+                rightFront,
+                leftBack,
+                rightBack,
+                gamepad
+        );
+    }
+    // 2. Modo COM orientação à arena (Field-Centric)
     public Command driveFieldCentric(Gamepad gamepad, Supplier<Double> headingSupplier) {
         return DriveCommands.mecanumDriveFieldCentric(
                 leftFront,
@@ -38,11 +49,12 @@ public class Drivetrain implements Mechanism {
                 headingSupplier
         );
     }
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+

@@ -2,6 +2,7 @@ repositories {
     mavenCentral()
     google() // Needed for androidx
     maven { url 'https://repo.dairy.foundation/releases/'}
+    maven { url 'https://maven.brott.dev/' }
 }
 
 dependencies {
@@ -23,6 +24,8 @@ dependencies {
     implementation 'dev.nextftc.v2:control:0.3.0'
     implementation 'dev.nextftc.v2:hardware:0.3.0'
     implementation 'dev.nextftc.v2:robot:0.3.0'
+
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
 
 
 }

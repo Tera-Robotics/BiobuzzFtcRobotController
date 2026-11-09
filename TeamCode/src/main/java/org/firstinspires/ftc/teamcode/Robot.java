@@ -13,7 +13,6 @@ import com.pedropathing.ivy.Command;
 
 import org.firstinspires.ftc.teamcode.OpModes.teleop.RobotState;
 import org.firstinspires.ftc.teamcode.mechanisms.Collector;
-import org.firstinspires.ftc.teamcode.mechanisms.Collector;
 import org.firstinspires.ftc.teamcode.mechanisms.ContinuousServo;
 import org.firstinspires.ftc.teamcode.mechanisms.Drivetrain;
 import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
@@ -46,13 +45,11 @@ public class Robot implements NextRobot {
     private final EnumMap<RobotState, Command> cases =
             new EnumMap<>(RobotState.class);
 
-    public Command handleState(BooleanSupplier dpadDown) {
 
-        EnumMap<RobotState, Command> cases =
-                new EnumMap<>(RobotState.class);
-        cases.put(RobotState.INITIAL, collectAntiGargalo(dpadDown));
-        cases.put(RobotState.COLLECT, collectAntiGargalo(dpadDown));
-        cases.put(RobotState.PREPARE, prepareState());
+    public Command handleState(BooleanSupplier buttonX, BooleanSupplier dpadDown) {
+
+        cases.put(RobotState.COLLECT, collectState(buttonX));
+        cases.put(RobotState.PREPARE, prepareState(buttonX));
         cases.put(RobotState.SHOOT, shootState(dpadDown));
 
         return match(() -> currentState, cases);
@@ -62,67 +59,45 @@ public class Robot implements NextRobot {
         return currentState;
     }
 
-    public Command shoot() {
+    // 1. ESTADO DE COLETA:
+    public Command collectState(BooleanSupplier buttonX) {
         return sequential(
-                launcherServo.openShooter(),
-                collector.collect(0.8),
-                launcher.setRpmCommand(3000)
-
+                launcherServo.closeShooter(),               // Fecha o servo
+                launcher.idleCommand(),                     // Deixa o lançador em espera/desligado
+                collector.smartCollect(0.8, 0.6).until(buttonX),
+                instant(() -> currentState = RobotState.PREPARE)
         );
     }
 
-    public Command shootState(BooleanSupplier DpadDown) {
+    // 2. ESTADO DE PREPARO:
+    public Command prepareState(BooleanSupplier buttonX) {
         return sequential(
-                shoot(),
-                race(
-                        waitMs(5000),
-                        waitUntil(DpadDown)
-                ),
-                instant(() -> currentState = RobotState.COLLECT)
-        );
-    }
+                launcher.setRpmCommand(2200),// Sobe o giro do lançador
+                waitUntil(() -> !buttonX.getAsBoolean()),
+                collector.holdStopped().until(buttonX),
 
-    public Command prepareState() {
-        return sequential(
-                collector.stopCollector(),
-                launcher.setRpmCommand(3000),
-                waitMs(5000),
                 instant(() -> currentState = RobotState.SHOOT)
         );
     }
 
-    private double collectThrottle = 0.8;
-    private long collectStartTime = 0;
-    private boolean lastDpadDown = false;
-    public Command collectAntiGargalo(BooleanSupplier dpadDown) {
-        return Command.build()
-                .setStart(() -> {
-                    collectThrottle = 0.8;
-                    collectStartTime = System.currentTimeMillis();
-                    lastDpadDown = false;
-                })
-                .setExecute(() -> {
-                    boolean currentDpad = dpadDown.getAsBoolean();
-
-                    if (currentDpad && !lastDpadDown) {
-                        collectThrottle = -collectThrottle;
-                        collectStartTime = System.currentTimeMillis();
-                    }
-                    lastDpadDown = currentDpad;
-                    collector.collectMotor1.setThrottle(collectThrottle);
-                    collector.collectMotor2.setThrottle(collectThrottle);
-                })
-                .setDone(() -> System.currentTimeMillis() - collectStartTime >= 5000 && collectThrottle > 0)
-                .setEnd(endCondition -> {
-                    collector.collectMotor1.setThrottle(collectThrottle);
-                    collector.collectMotor2.setThrottle(collectThrottle);
-                });
-    }
-    // seleciona o comando dependendo do estado atual
-    public Command handleState() {
-        return match(
-                () -> currentState,
-                cases
+    // 3. ESTADO DE DISPARO:
+    public Command shootState(BooleanSupplier cancelTrigger) {
+        return sequential(
+                launcherServo.openShooter(),                // Abre o servo
+                race(
+                        waitMs(3000),                       // Atira por 3 segundos
+                        waitUntil(cancelTrigger),
+                        collector.feedShooter()
+                ),
+                launcherServo.closeShooter(),               // Fecha o servo
+                collector.stopCollector(),                    // Desliga o coletor
+                instant(() -> currentState = RobotState.COLLECT) // Volta pro início
         );
     }
-}
+
+
+    }
+
+
+
+

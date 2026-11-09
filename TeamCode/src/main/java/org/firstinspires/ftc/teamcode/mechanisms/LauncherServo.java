@@ -1,17 +1,37 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
-import com.pedropathing.ivy.Command;
+import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
+import static com.pedropathing.ivy.groups.Groups.sequential;
 
-import dev.nextftc.hardware.actuators.NextFeedbackServo;
-import dev.nextftc.hardware.sensors.NextAnalogInput;
+import com.pedropathing.ivy.Command;
+import dev.nextftc.hardware.actuators.NextCRServo;
 import dev.nextftc.robot.Mechanism;
 
 public class LauncherServo implements Mechanism {
-    NextFeedbackServo shootServo = new NextFeedbackServo("ShooterServo", new NextAnalogInput("ServoEncoder"));
+    // Porta 0 de servo do Control Hub (ou use "ShootServo" se preferir usar o nome da config)
+    public final NextCRServo shootServo = new NextCRServo("ShootServo");
+
+    // Tempo de movimento em milissegundos (ajuste conforme a mecânica)
+    private final long TEMPO_MOVIMENTO_MS = 350;
+
     public Command openShooter() {
-        return instant(() -> shootServo.setPosition(0.0));
+        return sequential(
+                instant(() -> shootServo.setPower(1.0)),
+                waitMs(TEMPO_MOVIMENTO_MS),
+                instant(() -> shootServo.setPower(0.0))
+        );
     }
+
     public Command closeShooter() {
-        return instant(() -> shootServo.setPosition(0.25));
+        return sequential(
+                instant(() -> shootServo.setPower(-1.0)),
+                waitMs(200),
+                instant(() -> shootServo.setPower(0.0))
+        );
+    }
+
+    public Command stopShooter() {
+        return instant(() -> shootServo.setPower(0.0));
     }
 }

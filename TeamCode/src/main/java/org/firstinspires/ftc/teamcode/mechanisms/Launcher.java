@@ -85,8 +85,8 @@ public class Launcher implements Mechanism {
         // kV: Tensão proporcional necessária para manter a alta rotação estável
         // kP: Correção ativa rápida se a roda perder velocidade ao tocar a peça
         rightLauncher.getVelocityConstants().setKS(0.0057);
-        rightLauncher.getVelocityConstants().setKV(0.00055 / TICKS_TO_DEGREES);
-        rightLauncher.getVelocityConstants().setKP(0.00035 / TICKS_TO_DEGREES);
+        rightLauncher.getVelocityConstants().setKV(0.0006 / TICKS_TO_DEGREES);
+        rightLauncher.getVelocityConstants().setKP(0.0004 / TICKS_TO_DEGREES);
 
         // Faz o motor esquerdo seguir o direito no sentido INVERSO para prensar e cuspir a peça
         // (Se as rodas girarem para fora em vez de para dentro, mude REVERSE para FORWARD)

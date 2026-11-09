@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import static com.pedropathing.ivy.commands.Commands.waitMs;
+import static com.pedropathing.ivy.groups.Groups.parallel;
+import static com.pedropathing.ivy.groups.Groups.race;
+import static com.pedropathing.ivy.groups.Groups.sequential;
+
 import androidx.annotation.NonNull;
 
 import com.pedropathing.ivy.Command;
@@ -18,18 +23,101 @@ public class Collector implements Mechanism {
         collectMotor2.setDirection(NextMotor.Direction.REVERSE);
     }
 
-    public Command collect(double Throttle) {
+    public boolean isMotor1Stalled() {
+        return collectMotor1.getCurrent().getMagnitude() > 4.2;
+    }
+
+    public boolean isMotor2Stalled() {
+        return collectMotor2.getCurrent().getMagnitude() > 4.0; // M2 normal é 1A; acima de 4A tem bolinha!
+    }
+
+    public boolean isFull() {
+        return isMotor1Stalled() && isMotor2Stalled();
+    }
+
+    @NonNull
+    @Override
+    public Command getDefaultCommand(){
         return infinite(() -> {
-            collectMotor1.setThrottle(Throttle);
-            collectMotor2.setThrottle(Throttle);
+            collectMotor1.setThrottle(0.8);
+            collectMotor2.setThrottle(0.6);
         });
     }
 
+    public Command smartCollect(double t1, double t2) {
+        // Ciclo do Motor 1 (Estágio Interno / 1ª Bolinha):
+        Command cicloMotor1 = sequential(
+                race(infinite(() -> collectMotor1.setThrottle(t1)), waitMs(1000)),
+                infinite(() -> collectMotor1.setThrottle(t1)).until(this::isMotor1Stalled),
+                infinite(() -> collectMotor1.setThrottle(0.0)) // Desliga M1 e aguarda
+        );
+        // Ciclo do Motor 2 (Estágio Externo / 2ª Bolinha):
+        Command cicloMotor2 = sequential(
+                race(infinite(() -> collectMotor2.setThrottle(t2)), waitMs(1000)),
+                infinite(() -> collectMotor2.setThrottle(t2)).until(this::isMotor2Stalled),
+                infinite(() -> collectMotor2.setThrottle(0.0)) // Desliga M2 quando encher!
+        );
+        // Executa os dois ciclos em paralelo de forma totalmente independente:
+        return parallel(cicloMotor1, cicloMotor2);
+    }
+
+    public Command StartCollect(double Throttle, double Throttle2 ) {
+        return instant(() -> {
+            collectMotor1.setThrottle(Throttle);
+            collectMotor2.setThrottle(Throttle2);
+        });
+    }
+
+    public Command expellCollect(double Throttle, double Throttle2) {
+        return infinite(() -> {
+            collectMotor1.setThrottle(Throttle);
+            collectMotor2.setThrottle(Throttle2);
+        });
+    }
+
+    public Command feedShooter() {
+        return expellCollect(0.8, 0.6);
+    }
+
     public Command stopCollector() {
+        return instant(() -> {
+            collectMotor1.setThrottle(0.0);
+            collectMotor2.setThrottle(0.0);
+        });
+
+    }
+
+    public Command holdStopped() {
         return infinite(() -> {
             collectMotor1.setThrottle(0.0);
             collectMotor2.setThrottle(0.0);
         });
     }
-}
+    public Command antiGargaloCommand(BooleanSupplier reverseTrigger) {
+        class AntiGargaloState {
+            double currentSpeed = 0.8;
+            boolean lastButton = false;
+        }
+        AntiGargaloState s = new AntiGargaloState();
+        return Command.build()
+                .setStart(() -> {
+                    s.currentSpeed = 0.8;
+                    s.lastButton = false;
+                    StartCollect(0.8,0.6);
+                })
+                .setExecute(() -> {
+                    boolean buttonPressed = reverseTrigger.getAsBoolean();
+                    if (buttonPressed && !s.lastButton) {
+                        s.currentSpeed = -s.currentSpeed; // Inverte sentido
+                        collectMotor1.setThrottle(s.currentSpeed);
+                        collectMotor2.setThrottle(s.currentSpeed > 0 ? 0.6 : -0.6);
+                    }
+                    s.lastButton = buttonPressed;
+                })
+                .setEnd(endCondition -> {
+                    stopCollector();
+                });
+    }
+    }
+
 
