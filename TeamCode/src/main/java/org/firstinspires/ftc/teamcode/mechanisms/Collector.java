@@ -61,13 +61,6 @@ public class Collector implements Mechanism {
         return parallel(cicloMotor1, cicloMotor2);
     }
 
-    public Command StartCollect(double Throttle, double Throttle2 ) {
-        return instant(() -> {
-            collectMotor1.setThrottle(Throttle);
-            collectMotor2.setThrottle(Throttle2);
-        });
-    }
-
     public Command expellCollect(double Throttle, double Throttle2) {
         return infinite(() -> {
             collectMotor1.setThrottle(Throttle);
@@ -93,31 +86,8 @@ public class Collector implements Mechanism {
             collectMotor2.setThrottle(0.0);
         });
     }
-    public Command antiGargaloCommand(BooleanSupplier reverseTrigger) {
-        class AntiGargaloState {
-            double currentSpeed = 0.8;
-            boolean lastButton = false;
-        }
-        AntiGargaloState s = new AntiGargaloState();
-        return Command.build()
-                .setStart(() -> {
-                    s.currentSpeed = 0.8;
-                    s.lastButton = false;
-                    StartCollect(0.8,0.6);
-                })
-                .setExecute(() -> {
-                    boolean buttonPressed = reverseTrigger.getAsBoolean();
-                    if (buttonPressed && !s.lastButton) {
-                        s.currentSpeed = -s.currentSpeed; // Inverte sentido
-                        collectMotor1.setThrottle(s.currentSpeed);
-                        collectMotor2.setThrottle(s.currentSpeed > 0 ? 0.6 : -0.6);
-                    }
-                    s.lastButton = buttonPressed;
-                })
-                .setEnd(endCondition -> {
-                    stopCollector();
-                });
-    }
+
+
     }
 
 

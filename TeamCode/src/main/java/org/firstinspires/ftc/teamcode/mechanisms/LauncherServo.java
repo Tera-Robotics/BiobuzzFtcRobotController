@@ -9,7 +9,7 @@ import dev.nextftc.hardware.actuators.NextCRServo;
 import dev.nextftc.robot.Mechanism;
 
 public class LauncherServo implements Mechanism {
-    // Porta 0 de servo do Control Hub (ou use "ShootServo" se preferir usar o nome da config)
+
     public final NextCRServo shootServo = new NextCRServo("ShootServo");
 
     // Tempo de movimento em milissegundos (ajuste conforme a mecânica)

@@ -45,7 +45,7 @@ public class MainTeleop extends NextOpMode {
                 robot.drivetrain.leftBack,
                 robot.drivetrain.rightBack,
                 gamepad1,
-                () -> follower.pose().heading()
+                () -> follower.pose().heading() + (Math.PI / 2)
         ).schedule();
 
         // 2. Slow mode no Left Bumper
@@ -65,8 +65,8 @@ public class MainTeleop extends NextOpMode {
 
     private void agendarEstadoAtual() {
         robot.handleState(
-                () -> gamepad1.x, // R2 avança de estado
-                () -> gamepad1.dpad_down            // Dpad Down cancela/encerra o tiro
+                () -> gamepad1.x,
+                () -> gamepad1.dpad_down
         ).schedule();
         lastState = robot.currentState;
     }
@@ -77,9 +77,9 @@ public class MainTeleop extends NextOpMode {
         follower.update();
 
         // Se o estado mudou (ex: de COLLECT para PREPARE ou SHOOT), agenda o novo estado:
-        if (robot.currentState != lastState) {
+        /*if (robot.currentState != lastState) {
             agendarEstadoAtual();
-        }
+        }*/
 
         // Telemetrias atualizando 100% em tempo real:
         telemetry.addData("Estado do Robô", robot.getCurrentState());

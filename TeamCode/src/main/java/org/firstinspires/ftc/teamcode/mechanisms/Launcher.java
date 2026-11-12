@@ -24,12 +24,13 @@ public class Launcher implements Mechanism {
     // O motor REV HD Hex sem redução tem 28 ticks por volta completa (PPR)
     private static final double TICKS_PER_REV = 28.0;
 
-    // Converte a leitura bruta do encoder para graus (360° / 28 ticks = ~12.857° por tick)
+    // transforma ticks em graus (360° / 28 ticks = ~12.857° por tick)
     private static final double TICKS_TO_DEGREES = 360.0 / TICKS_PER_REV;
 
     // Fator de conversão entre RPM e Graus por Segundo:
     // 1 volta = 360 graus | 1 minuto = 60 segundos -> 360 / 60 = 6.0
-    // Portanto: GrausPorSegundo = RPM * 6.0
+    // Portanto: GrausPorSegundo = 360 * 6.0
+    // Ou seja, 1 RPM = 6.0 graus por segundo
     private static final double RPM_TO_DEG_PER_SEC = 360.0 / 60.0; // Valor fixo: 6.0
 
     // =========================================================================
